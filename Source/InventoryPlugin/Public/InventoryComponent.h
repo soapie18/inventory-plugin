@@ -9,15 +9,13 @@
 
 
 USTRUCT()
-struct FInventoryItemStack 
+struct FInventoryItemSlot 
 {
 	GENERATED_BODY()
-
 public:
-	TObjectPtr<UItemDataAsset> itemData = nullptr;
- 
-	float currentQuanity = 0.0f;
-};
+	TObjectPtr<UItemDataAsset> ItemData = nullptr;
+	float currentQuantity = 0.0f;
+}; 
 
 
 
@@ -40,8 +38,14 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY()
-	TArray<FInventoryItemStack> ItemsArr;
-
-	bool AddItemToInventory(UItemDataAsset* itemData);
+	UFUNCTION( BlueprintCallable )
+	bool AddItemToInventory(UItemDataAsset* ItemData);
+	
+	UFUNCTION( BlueprintCallable )
+	void DebugPrintItemsStored();
+	
+private:
+	
+	TArray<FInventoryItemSlot> InventoryArray {};
+	
 };

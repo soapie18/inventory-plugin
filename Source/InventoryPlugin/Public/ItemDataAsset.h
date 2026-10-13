@@ -15,21 +15,27 @@ class INVENTORYPLUGIN_API UItemDataAsset : public UDataAsset
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(BlueprintReadOnly)
-	FName identifier;
+	UPROPERTY(EditAnywhere)
+	FName itemID;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere)
 	FText itemDisplayName;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere)
 	float itemWeight;
+	
+	UPROPERTY(EditAnywhere)
+	float itemValue;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere)
 	bool stackable;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere)
 	float stackHeight;
 
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UTexture2D> itemIcon;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UTexture2D> itemIcon = nullptr;;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMesh> itemMesh = nullptr;
 };
