@@ -44,8 +44,15 @@ public:
 	UFUNCTION( BlueprintCallable )
 	void DebugPrintItemsStored();
 	
+	// UFUNCTION( BlueprintCallable, BlueprintPure)
+	// float CalculateNetInventoryValue();
+	//
+	
 private:
 	
 	TArray<FInventoryItemSlot> InventoryArray {};
 	
+// public:
+// 	UPROPERTY( BlueprintReadWrite, EditAnywhere, Category = "Inventory Details" )
+// 	float MaxCarryCapacity;
 };

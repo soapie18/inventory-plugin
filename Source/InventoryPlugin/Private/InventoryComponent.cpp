@@ -11,6 +11,8 @@ UInventoryComponent::UInventoryComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	
+	//MaxCarryCapacity = 10.0f;
 }
 
 
@@ -52,12 +54,12 @@ bool UInventoryComponent::AddItemToInventory(UItemDataAsset* ItemData)
 		}
 	}
 	
-	//TODO: upgrade to TMultiMap if becomes relevant - see docs
+	//change to using TMultiMap if becomes relevant - see docs
 	FInventoryItemSlot NewItem;
 	NewItem.ItemData = ItemData;
 	InventoryArray.Add(NewItem);
 	
-	return false;
+	return true;
 }
 
 void UInventoryComponent::DebugPrintItemsStored()
@@ -65,9 +67,23 @@ void UInventoryComponent::DebugPrintItemsStored()
 	for (const FInventoryItemSlot& Stack : InventoryArray)
 	{
 		FName Message = Stack.ItemData->itemID;
-		GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Green, Message.ToString());
+		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Green, Message.ToString());
 	}
 	
 }
+
+// float UInventoryComponent::CalculateNetInventoryValue()
+// {
+// 	float NetInventoryValue = 0.0f;
+// 	
+// 	for (const FInventoryItemSlot& Stack : InventoryArray)
+// 	{
+// 		NetInventoryValue += Stack.ItemData->itemValue;
+// 	}
+// 	
+// 	return NetInventoryValue;
+// }
+
+
 
 
