@@ -9,12 +9,12 @@
 
 
 USTRUCT()
-struct FInventoryItemSlot 
+struct FInventorySlot 
 {
 	GENERATED_BODY()
 public:
 	TObjectPtr<UItemDataAsset> ItemData = nullptr;
-	int currentQuantity = 0;
+	int Quantity = 0;
 }; 
 
 
@@ -44,7 +44,7 @@ public:
 	bool AddItemToInventory(UItemDataAsset* ItemData);
 	
 
-	// Debigging Functions
+	// Debugging Functions
 
 	UFUNCTION( BlueprintCallable )
 	void DebugPrintItemsStored();
@@ -60,9 +60,9 @@ public:
 	
 private:
 	
-	TArray<FInventoryItemSlot> InventoryArray {};
+	TArray<FInventorySlot> InventoryArray {};
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY()
 	float NetInventoryValue;
 	
  //public:

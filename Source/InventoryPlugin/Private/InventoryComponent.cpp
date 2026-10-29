@@ -44,30 +44,30 @@ bool UInventoryComponent::AddItemToInventory(UItemDataAsset* ItemData)
 
 	if (ItemData->stackable)
 	{
-		for (FInventoryItemSlot& Stack : InventoryArray)
+		for (FInventorySlot& Stack : InventoryArray)
 		{
-			if (Stack.ItemData == ItemData && Stack.currentQuantity < ItemData->stackHeight)
+			if (Stack.ItemData == ItemData && Stack.Quantity < ItemData->stackHeight)
 			{
-				Stack.currentQuantity += 1;
+				Stack.Quantity += 1;
 				return true;
 			}
 		}
 	}
 
 	//change to using TMultiMap if becomes relevant - see docs
-	FInventoryItemSlot NewItem;
+	FInventorySlot NewSlot;
 
-	NewItem.ItemData = ItemData;
-	NewItem.currentQuantity = 1;
+	NewSlot.ItemData = ItemData;
+	NewSlot.Quantity = 1;
 
-	InventoryArray.Add(NewItem);
+	InventoryArray.Add(NewSlot);
 
 	return true;
 }
 
 void UInventoryComponent::DebugPrintItemsStored()
 {
-	for (const FInventoryItemSlot& Stack : InventoryArray)
+	for (const FInventorySlot& Stack : InventoryArray)
 	{
 		FName Message = Stack.ItemData->itemID;
 		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Green, Message.ToString());
@@ -75,15 +75,15 @@ void UInventoryComponent::DebugPrintItemsStored()
 
 }
 
-int UInventoryComponent::GetStackQuanitityOfItem(UItemDataAsset* itemData)
+int UInventoryComponent::GetStackQuanitityOfItem(UItemDataAsset* ItemData)
 {
 	int itemStackSize = 0;
 
-	for (FInventoryItemSlot& Stack : InventoryArray)
+	for (FInventorySlot& Stack : InventoryArray)
 	{
-		if (Stack.ItemData == itemData)
+		if (Stack.ItemData == ItemData)
 		{
-			itemStackSize = Stack.currentQuantity;
+			itemStackSize = Stack.Quantity;
 			return itemStackSize;
 		}
 	}
@@ -94,8 +94,9 @@ int UInventoryComponent::GetStackQuanitityOfItem(UItemDataAsset* itemData)
 
 float UInventoryComponent::GetNetInventoryValue()
 {
-
-	for (const FInventoryItemSlot& Stack : InventoryArray)
+	NetInventoryValue = 0;
+	
+	for (const FInventorySlot& Stack : InventoryArray)
 	{
 		NetInventoryValue += Stack.ItemData->itemValue;
 	}
