@@ -11,6 +11,8 @@ UInventoryComponent::UInventoryComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+
+	//MaxCarryCapacity = 10.0f;
 }
 
 
@@ -20,7 +22,7 @@ void UInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
 }
 
 
@@ -39,25 +41,28 @@ bool UInventoryComponent::AddItemToInventory(UItemDataAsset* ItemData)
 	{
 		return false;
 	}
-	
+
 	if (ItemData->stackable)
 	{
 		for (FInventoryItemSlot& Stack : InventoryArray)
 		{
-			if (Stack.ItemData == ItemData && Stack.currentQuantity < ItemData->stackHeight )
+			if (Stack.ItemData == ItemData && Stack.currentQuantity < ItemData->stackHeight)
 			{
-				Stack.currentQuantity++;
+				Stack.currentQuantity += 1;
 				return true;
 			}
 		}
 	}
-	
-	//TODO: upgrade to TMultiMap if becomes relevant - see docs
+
+	//change to using TMultiMap if becomes relevant - see docs
 	FInventoryItemSlot NewItem;
+
 	NewItem.ItemData = ItemData;
+	NewItem.currentQuantity = 1;
+
 	InventoryArray.Add(NewItem);
-	
-	return false;
+
+	return true;
 }
 
 void UInventoryComponent::DebugPrintItemsStored()
@@ -65,9 +70,39 @@ void UInventoryComponent::DebugPrintItemsStored()
 	for (const FInventoryItemSlot& Stack : InventoryArray)
 	{
 		FName Message = Stack.ItemData->itemID;
-		GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Green, Message.ToString());
+		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Green, Message.ToString());
 	}
-	
+
 }
+
+int UInventoryComponent::GetStackQuanitityOfItem(UItemDataAsset* itemData)
+{
+	int itemStackSize = 0;
+
+	for (FInventoryItemSlot& Stack : InventoryArray)
+	{
+		if (Stack.ItemData == itemData)
+		{
+			itemStackSize = Stack.currentQuantity;
+			return itemStackSize;
+		}
+	}
+
+	return itemStackSize;
+
+}
+
+float UInventoryComponent::GetNetInventoryValue()
+{
+
+	for (const FInventoryItemSlot& Stack : InventoryArray)
+	{
+		NetInventoryValue += Stack.ItemData->itemValue;
+	}
+
+	return NetInventoryValue;
+}
+
+
 
 

@@ -14,7 +14,7 @@ struct FInventoryItemSlot
 	GENERATED_BODY()
 public:
 	TObjectPtr<UItemDataAsset> ItemData = nullptr;
-	float currentQuantity = 0.0f;
+	int currentQuantity = 0;
 }; 
 
 
@@ -38,14 +38,37 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// Key functionality
+
 	UFUNCTION( BlueprintCallable )
 	bool AddItemToInventory(UItemDataAsset* ItemData);
 	
+
+	// Debigging Functions
+
 	UFUNCTION( BlueprintCallable )
 	void DebugPrintItemsStored();
+
+
+	// Getter functions
+	
+	UFUNCTION( BlueprintCallable, BlueprintPure=true)
+	float GetNetInventoryValue();
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure=true)
+	int GetStackQuanitityOfItem(UItemDataAsset* itemData);
 	
 private:
 	
 	TArray<FInventoryItemSlot> InventoryArray {};
+
+	UPROPERTY(BlueprintReadOnly)
+	float NetInventoryValue;
 	
+ //public:
+ //	UPROPERTY( BlueprintReadWrite, EditAnywhere, Category = "Inventory Details" )
+ //	float MaxCarryCapacity;
+
+	
+
 };
