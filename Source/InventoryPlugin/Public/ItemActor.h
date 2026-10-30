@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ItemDataAsset.h"
+#include "Engine/DataTable.h"
 #include "Components/BoxComponent.h"
 #include "ItemActor.generated.h"
 
@@ -22,25 +22,21 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Data")
-	TObjectPtr<UItemDataAsset> ItemData = nullptr;
+
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UItemDataAsset* GetItemActorData() const  { return ItemData; }
+
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Default")
-	TObjectPtr<UStaticMeshComponent> StaticMesh = nullptr;
-	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Default")
-	TObjectPtr<USceneComponent> DefaultSceneRoot = nullptr;
+	TObjectPtr<UStaticMeshComponent> _StaticMesh = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Default")
-	TObjectPtr<UBoxComponent> Box;
+	TObjectPtr<UBoxComponent> _Box;
+
+	UPROPERTY(EditAnywhere)
+	FDataTableRowHandle _RowHandle;
+
 
 };

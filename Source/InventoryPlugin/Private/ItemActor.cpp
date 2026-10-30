@@ -6,13 +6,19 @@
 AItemActor::AItemActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+
 	
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("StaticMesh"));
 	
-	DefaultSceneRoot = StaticMesh;
+	_StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("StaticMesh"));
 	
-	Box = CreateDefaultSubobject<UBoxComponent>(FName("BoxCollider"));
+	RootComponent = _StaticMesh;
+	
+	_Box = CreateDefaultSubobject<UBoxComponent>(FName("BoxCollider"));
+
+	_Box->SetBoxExtent(FVector(32, 32, 32));
+	_Box->SetGenerateOverlapEvents(true);
+	_Box->AttachToComponent(_StaticMesh, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 // Called when the game starts or when spawned
