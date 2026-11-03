@@ -14,7 +14,7 @@ struct FInventorySlot
 {
 	GENERATED_BODY()
 public:
-	/*TObjectPtr<UItemDataAsset> ItemData = nullptr;*/
+	FItemRowData* ItemData = nullptr;	
 	int Quantity = 0;
 }; 
 
@@ -53,6 +53,9 @@ public:
 
 	// Getter functions
 	
+	UFUNCTION( BlueprintCallable, BlueprintPure = true, Category = "Get - Inventory" )
+	float GetCurrentWeight();
+	
 	//UFUNCTION( BlueprintCallable, BlueprintPure=true)
 	//float GetNetInventoryValue();
 	
@@ -65,14 +68,14 @@ private:
 
 	UPROPERTY()
 	float NetInventoryValue;
-
-	UPROPERTY()
-	UDataTable* _ItemsTable = nullptr;
 	
- //public:
- //	UPROPERTY( BlueprintReadWrite, EditAnywhere, Category = "Inventory Details" )
- //	float MaxCarryCapacity;
+	UPROPERTY(EditAnywhere, Category = "Inventory Details")
+	float MaxCarryCapacity;
 
+public:
 	
+	UPROPERTY(EditAnywhere, Category = "Inventory Details")
+	TObjectPtr<UDataTable> ItemsTable = nullptr;
+
 
 };

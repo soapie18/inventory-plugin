@@ -10,15 +10,15 @@ AItemActor::AItemActor()
 
 	
 	
-	_StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("StaticMesh"));
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("StaticMesh"));
 	
-	RootComponent = _StaticMesh;
+	RootComponent = StaticMesh;
 	
-	_Box = CreateDefaultSubobject<UBoxComponent>(FName("BoxCollider"));
+	Box = CreateDefaultSubobject<UBoxComponent>(FName("BoxCollider"));
 
-	_Box->SetBoxExtent(FVector(32, 32, 32));
-	_Box->SetGenerateOverlapEvents(true);
-	_Box->AttachToComponent(_StaticMesh, FAttachmentTransformRules::KeepRelativeTransform);
+	Box->SetBoxExtent(FVector(64, 64, 64));
+	Box->SetGenerateOverlapEvents(true);
+	Box->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned

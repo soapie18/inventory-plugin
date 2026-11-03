@@ -34,50 +34,77 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 }
 
 
+// Getters
+float UInventoryComponent::GetCurrentWeight()
+{
+	float TotalWeight = 0;	
+	
+	for (const FInventorySlot& Slot : InventoryArray)
+	{
+		TotalWeight += Slot.ItemData->ItemWeight;
+	}
+	
+	return TotalWeight;
+}
+
+
 bool UInventoryComponent::AddItemToInventory(FName RowName)
 {
-	FItemRowData* Row = _ItemsTable->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
-
-	if (Row != nullptr)
+	if (ItemsTable == nullptr)
 	{
-		FString Message = (Row->ItemID);
-		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Green, Message);
-		return true;
+		return false;
 	}
+	
+	FItemRowData* Row = ItemsTable->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
 
-	return false;
-
-	//if (ItemData->stackable)
-	//{
-	//	for (FInventorySlot& Stack : InventoryArray)
-	//	{
-	//		if (Stack.ItemData == ItemData && Stack.Quantity < ItemData->stackHeight)
-	//		{
-	//			Stack.Quantity += 1;
-	//			return true;
-	//		}
-	//	}
-	//}
-
-	////change to using TMultiMap if becomes relevant - see docs
-	//FInventorySlot NewSlot;
-
-	//NewSlot.ItemData = ItemData;
-	//NewSlot.Quantity = 1;
-
-	//InventoryArray.Add(NewSlot);
-
-	//return true;
+	if (Row == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Null Ptr"));
+		return false;
+	}
+	
+	float CurrentWeight = GetCurrentWeight();
+	
+	if (Row->ItemWeight + CurrentWeight > MaxCarryCapacity)
+	{
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Max Capacity Reached"));
+		return false;
+	}
+	
+	if (Row->Stackable)
+	{
+		for (FInventorySlot& Slot : InventoryArray)
+		{
+			if (Slot.ItemData == Row && Slot.Quantity < Row->StackHeight)
+			{
+				Slot.Quantity += 1;
+				return true;
+			}
+		}
+	}
+	
+	FInventorySlot NewSlot;
+	NewSlot.ItemData = Row;
+	NewSlot.Quantity = 1;
+	
+	InventoryArray.Add(NewSlot);
+	
+	return true;
 }
+
 
 void UInventoryComponent::DebugPrintItemsStored()
 {
-	/*for (const FInventorySlot& Stack : InventoryArray)
+	FString Message;
+	
+	for (const FInventorySlot& Slot : InventoryArray)
 	{
-		FName Message = Stack.ItemData->itemID;
-		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Green, Message.ToString());
-	}*/
-
+		Message.Append(Slot.ItemData->ItemDisplayName.ToString() + " : ");
+		Message.AppendInt(Slot.Quantity);
+		Message.Append(", ");
+		
+		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Green, Message);
+	}
 }
 
 

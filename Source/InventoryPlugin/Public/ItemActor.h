@@ -28,16 +28,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(RowType= "ItemRowData"))
-	FDataTableRowHandle _RowHandle;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(RowType= "ItemRowData"), Category = "Item Details")
+	FDataTableRowHandle ItemRowHandle;
 
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Default")
-	TObjectPtr<UStaticMeshComponent> _StaticMesh = nullptr;
+	TObjectPtr<UStaticMeshComponent> StaticMesh = nullptr;
 
 	UPROPERTY(VisibleAnywhere, Category = "Default")
-	TObjectPtr<UBoxComponent> _Box;
+	TObjectPtr<UBoxComponent> Box;
 
 
 };
