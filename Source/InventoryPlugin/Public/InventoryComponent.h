@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ItemDataAsset.h"
+#include "ItemRowData.h"
+#include "Engine/DataTable.h"
 #include "InventoryComponent.generated.h"
 
 
@@ -13,7 +14,7 @@ struct FInventorySlot
 {
 	GENERATED_BODY()
 public:
-	TObjectPtr<UItemDataAsset> ItemData = nullptr;
+	/*TObjectPtr<UItemDataAsset> ItemData = nullptr;*/
 	int Quantity = 0;
 }; 
 
@@ -41,7 +42,7 @@ public:
 	// Key functionality
 
 	UFUNCTION( BlueprintCallable )
-	bool AddItemToInventory(UItemDataAsset* ItemData);
+	bool AddItemToInventory(FName Row);
 	
 
 	// Debugging Functions
@@ -52,11 +53,11 @@ public:
 
 	// Getter functions
 	
-	UFUNCTION( BlueprintCallable, BlueprintPure=true)
-	float GetNetInventoryValue();
+	//UFUNCTION( BlueprintCallable, BlueprintPure=true)
+	//float GetNetInventoryValue();
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure=true)
-	int GetStackQuanitityOfItem(UItemDataAsset* itemData);
+	/*UFUNCTION(BlueprintCallable, BlueprintPure=true)
+	int GetStackQuanitityOfItem(UItemDataAsset* itemData);*/
 	
 private:
 	
@@ -64,6 +65,9 @@ private:
 
 	UPROPERTY()
 	float NetInventoryValue;
+
+	UPROPERTY()
+	UDataTable* _ItemsTable = nullptr;
 	
  //public:
  //	UPROPERTY( BlueprintReadWrite, EditAnywhere, Category = "Inventory Details" )

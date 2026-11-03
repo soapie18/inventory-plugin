@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "InventoryComponent.h"
 
 
@@ -35,74 +34,54 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 }
 
 
-bool UInventoryComponent::AddItemToInventory(UItemDataAsset* ItemData)
+bool UInventoryComponent::AddItemToInventory(FName RowName)
 {
-	if (!ItemData)
+	FItemRowData* Row = _ItemsTable->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
+
+	if (Row != nullptr)
 	{
-		return false;
+		FString Message = (Row->ItemID);
+		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Green, Message);
+		return true;
 	}
 
-	if (ItemData->stackable)
-	{
-		for (FInventorySlot& Stack : InventoryArray)
-		{
-			if (Stack.ItemData == ItemData && Stack.Quantity < ItemData->stackHeight)
-			{
-				Stack.Quantity += 1;
-				return true;
-			}
-		}
-	}
+	return false;
 
-	//change to using TMultiMap if becomes relevant - see docs
-	FInventorySlot NewSlot;
+	//if (ItemData->stackable)
+	//{
+	//	for (FInventorySlot& Stack : InventoryArray)
+	//	{
+	//		if (Stack.ItemData == ItemData && Stack.Quantity < ItemData->stackHeight)
+	//		{
+	//			Stack.Quantity += 1;
+	//			return true;
+	//		}
+	//	}
+	//}
 
-	NewSlot.ItemData = ItemData;
-	NewSlot.Quantity = 1;
+	////change to using TMultiMap if becomes relevant - see docs
+	//FInventorySlot NewSlot;
 
-	InventoryArray.Add(NewSlot);
+	//NewSlot.ItemData = ItemData;
+	//NewSlot.Quantity = 1;
 
-	return true;
+	//InventoryArray.Add(NewSlot);
+
+	//return true;
 }
 
 void UInventoryComponent::DebugPrintItemsStored()
 {
-	for (const FInventorySlot& Stack : InventoryArray)
+	/*for (const FInventorySlot& Stack : InventoryArray)
 	{
 		FName Message = Stack.ItemData->itemID;
 		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Green, Message.ToString());
-	}
+	}*/
 
 }
 
-int UInventoryComponent::GetStackQuanitityOfItem(UItemDataAsset* ItemData)
-{
-	int itemStackSize = 0;
 
-	for (FInventorySlot& Stack : InventoryArray)
-	{
-		if (Stack.ItemData == ItemData)
-		{
-			itemStackSize = Stack.Quantity;
-			return itemStackSize;
-		}
-	}
 
-	return itemStackSize;
-
-}
-
-float UInventoryComponent::GetNetInventoryValue()
-{
-	NetInventoryValue = 0;
-	
-	for (const FInventorySlot& Stack : InventoryArray)
-	{
-		NetInventoryValue += Stack.ItemData->itemValue;
-	}
-
-	return NetInventoryValue;
-}
 
 
 
