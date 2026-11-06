@@ -42,26 +42,34 @@ public:
 	// Key functionality
 
 	UFUNCTION( BlueprintCallable )
-	bool AddItemToInventory(FName Row);
-	
+	bool AddItemToInventory(FName Row, UDataTable* Table);
 
+	UFUNCTION(BlueprintCallable)
+	bool RemoveItemFromInventory(FName Row, UDataTable* Table);
+
+	UFUNCTION(BlueprintCallable)
+	void InstantiateDroppedObject(FName Row, UDataTable* Table);
+	
 	// Debugging Functions
 
 	UFUNCTION( BlueprintCallable )
 	void DebugPrintItemsStored();
 
-
 	// Getter functions
 	
-	UFUNCTION( BlueprintCallable, BlueprintPure = true, Category = "Get - Inventory" )
+	UFUNCTION( BlueprintCallable, BlueprintPure = true, Category = "Inventory" )
 	float GetCurrentWeight();
-	
-	//UFUNCTION( BlueprintCallable, BlueprintPure=true)
-	//float GetNetInventoryValue();
-	
-	/*UFUNCTION(BlueprintCallable, BlueprintPure=true)
-	int GetStackQuanitityOfItem(UItemDataAsset* itemData);*/
-	
+
+	UFUNCTION(BlueprintCallable, BlueprintPure = true, Category = "Inventory")
+	float GetCurrentValue();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure = true, Category = "Inventory")
+	int GetNumberOfStacks();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure = true, Category = "Inventory")
+	int GetTotalArrayItemsQuantity();
+
+
 private:
 	
 	TArray<FInventorySlot> InventoryArray {};

@@ -35,6 +35,7 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 
 // Getters
+
 float UInventoryComponent::GetCurrentWeight()
 {
 	float TotalWeight = 0;	
@@ -47,19 +48,51 @@ float UInventoryComponent::GetCurrentWeight()
 	return TotalWeight;
 }
 
-
-bool UInventoryComponent::AddItemToInventory(FName RowName)
+float UInventoryComponent::GetCurrentValue()
 {
-	if (ItemsTable == nullptr)
+	float TotalValue = 0;
+
+	for (const FInventorySlot& Slot : InventoryArray)
 	{
+		TotalValue += Slot.ItemData->ItemWeight;
+	}
+
+	return TotalValue;
+}
+
+int UInventoryComponent::GetNumberOfStacks()
+{
+	return InventoryArray.Num();
+}
+
+int UInventoryComponent::GetTotalArrayItemsQuantity()
+{
+	int TotalQuantity = 0;
+
+	for (const FInventorySlot& Slot : InventoryArray)
+	{
+		TotalQuantity += Slot.Quantity;
+	}
+	
+	return TotalQuantity;
+}
+
+
+// Key Functionality
+
+bool UInventoryComponent::AddItemToInventory(FName RowName, UDataTable* Table)
+{
+	if (Table == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Table Null Ptr"));
 		return false;
 	}
 	
-	FItemRowData* Row = ItemsTable->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
+	FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
 
 	if (Row == nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Null Ptr"));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Row Null Ptr"));
 		return false;
 	}
 	
@@ -67,7 +100,7 @@ bool UInventoryComponent::AddItemToInventory(FName RowName)
 	
 	if (Row->ItemWeight + CurrentWeight > MaxCarryCapacity)
 	{
-		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Max Capacity Reached"));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Max Capacity Would Be Exceeded"));
 		return false;
 	}
 	
@@ -92,6 +125,55 @@ bool UInventoryComponent::AddItemToInventory(FName RowName)
 	return true;
 }
 
+
+bool UInventoryComponent::RemoveItemFromInventory(FName RowName, UDataTable* Table)
+{
+	if (Table == nullptr)
+	{
+		return false;
+	}
+
+	FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
+
+	if (Row == nullptr)
+	{
+		return false;
+	}
+
+	bool ItemFound = false;
+
+	for (FInventorySlot& Slot : InventoryArray)
+	{
+		if (Row == Slot.ItemData)
+		{
+			ItemFound = true;
+
+			Slot.Quantity -= 1;
+
+			if (Slot.Quantity == 0)
+			{
+				InventoryArray.Remove(Slot);
+			}
+		}
+
+		if (ItemFound)
+		{
+			break;
+		}
+	}
+
+	if (ItemFound)
+	{
+		return true;
+	}
+
+	else
+	{
+		return false;
+	}
+}
+
+// Output funcs
 
 void UInventoryComponent::DebugPrintItemsStored()
 {
