@@ -77,6 +77,11 @@ int UInventoryComponent::GetTotalArrayItemsQuantity()
 	return TotalQuantity;
 }
 
+FString UInventoryComponent::GetItemID(FItemRowData data)
+{
+	return data.ItemID;
+}
+
 
 // Key Functionality
 
@@ -88,7 +93,7 @@ bool UInventoryComponent::AddItemToInventory(FName RowName, UDataTable* Table)
 		return false;
 	}
 	
-	FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
+	const FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
 
 	if (Row == nullptr)
 	{
@@ -108,7 +113,7 @@ bool UInventoryComponent::AddItemToInventory(FName RowName, UDataTable* Table)
 	{
 		for (FInventorySlot& Slot : InventoryArray)
 		{
-			if (Slot.ItemData == Row && Slot.Quantity < Row->StackHeight)
+			if (Slot.ItemData->ItemID == Row->ItemID && Slot.Quantity < Row->StackHeight)
 			{
 				Slot.Quantity += 1;
 				return true;
@@ -133,7 +138,7 @@ bool UInventoryComponent::RemoveItemFromInventory(FName RowName, UDataTable* Tab
 		return false;
 	}
 
-	FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
+	const FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
 
 	if (Row == nullptr)
 	{
@@ -142,9 +147,13 @@ bool UInventoryComponent::RemoveItemFromInventory(FName RowName, UDataTable* Tab
 
 	bool ItemFound = false;
 
+	FString RowID = GetItemID(*Row);
+
 	for (FInventorySlot& Slot : InventoryArray)
 	{
-		if (Row == Slot.ItemData)
+		FString SlotID = GetItemID(*Slot.ItemData);
+
+		if (RowID == SlotID)
 		{
 			ItemFound = true;
 
@@ -152,7 +161,9 @@ bool UInventoryComponent::RemoveItemFromInventory(FName RowName, UDataTable* Tab
 
 			if (Slot.Quantity == 0)
 			{
+
 				InventoryArray.Remove(Slot);
+				//delete Slot;
 			}
 		}
 

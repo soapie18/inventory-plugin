@@ -14,7 +14,7 @@ struct FInventorySlot
 {
 	GENERATED_BODY()
 public:
-	FItemRowData* ItemData = nullptr;	
+	const FItemRowData* ItemData = nullptr;	
 	int Quantity = 0;
 }; 
 
@@ -68,6 +68,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = true, Category = "Inventory")
 	int GetTotalArrayItemsQuantity();
+
+	UFUNCTION()
+	FString GetItemID(FItemRowData data);
 
 
 private:
