@@ -42,13 +42,13 @@ public:
 	// Key functionality
 
 	UFUNCTION( BlueprintCallable )
-	bool AddItemToInventory(FName Row, UDataTable* Table);
+	bool AddItemToInventory(FName Row, UDataTable* Table, int QuantityToAdd);
 
 	UFUNCTION(BlueprintCallable)
 	bool RemoveItemFromInventory(FName Row, UDataTable* Table);
 
-	UFUNCTION(BlueprintCallable)
-	void InstantiateDroppedObject(FName Row, UDataTable* Table);
+	/*UFUNCTION(BlueprintCallable)
+	void InstantiateDroppedObject(FName Row, UDataTable* Table);*/
 	
 	// Debugging Functions
 
@@ -57,9 +57,6 @@ public:
 
 	// Getter functions
 	
-	UFUNCTION( BlueprintCallable, BlueprintPure = true, Category = "Inventory" )
-	float GetCurrentWeight();
-
 	UFUNCTION(BlueprintCallable, BlueprintPure = true, Category = "Inventory")
 	float GetCurrentValue();
 
@@ -69,8 +66,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure = true, Category = "Inventory")
 	int GetTotalArrayItemsQuantity();
 
-	UFUNCTION()
-	FString GetItemID(FItemRowData data);
 
 
 private:
@@ -83,6 +78,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Inventory Details")
 	float MaxCarryCapacity;
 
+	bool AllSlotsFilled = false;
+	
 public:
 	
 	UPROPERTY(EditAnywhere, Category = "Inventory Details")

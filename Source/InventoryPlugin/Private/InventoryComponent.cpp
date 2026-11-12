@@ -36,17 +36,7 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 // Getters
 
-float UInventoryComponent::GetCurrentWeight()
-{
-	float TotalWeight = 0;	
-	
-	for (const FInventorySlot& Slot : InventoryArray)
-	{
-		TotalWeight += Slot.ItemData->ItemWeight;
-	}
-	
-	return TotalWeight;
-}
+
 
 float UInventoryComponent::GetCurrentValue()
 {
@@ -54,7 +44,7 @@ float UInventoryComponent::GetCurrentValue()
 
 	for (const FInventorySlot& Slot : InventoryArray)
 	{
-		TotalValue += Slot.ItemData->ItemWeight;
+		TotalValue += Slot.ItemData->ItemValue;
 	}
 
 	return TotalValue;
@@ -77,15 +67,10 @@ int UInventoryComponent::GetTotalArrayItemsQuantity()
 	return TotalQuantity;
 }
 
-FString UInventoryComponent::GetItemID(FItemRowData data)
-{
-	return data.ItemID;
-}
-
 
 // Key Functionality
 
-bool UInventoryComponent::AddItemToInventory(FName RowName, UDataTable* Table)
+bool UInventoryComponent::AddItemToInventory(FName RowName, UDataTable* Table, int QuantityToAdd)
 {
 	if (Table == nullptr)
 	{
@@ -93,7 +78,7 @@ bool UInventoryComponent::AddItemToInventory(FName RowName, UDataTable* Table)
 		return false;
 	}
 	
-	const FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
+	FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
 
 	if (Row == nullptr)
 	{
@@ -101,33 +86,57 @@ bool UInventoryComponent::AddItemToInventory(FName RowName, UDataTable* Table)
 		return false;
 	}
 	
-	float CurrentWeight = GetCurrentWeight();
+	//first check to see if theres space in a previous slot. when making a new slot check if max slots is hit then use reserve with the remainder as N.
 	
-	if (Row->ItemWeight + CurrentWeight > MaxCarryCapacity)
-	{
-		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Max Capacity Would Be Exceeded"));
-		return false;
-	}
+	//could use recursion to keep calling this function until all of QuanityToAdd has either found a home or been dropped, since it might be quite a large
+	//number and theres no way of telling it will fit in 2 stacks perfectly.
 	
-	if (Row->Stackable)
+	for (FInventorySlot& Slot : InventoryArray)
 	{
-		for (FInventorySlot& Slot : InventoryArray)
+		if (Slot.ItemData->ItemID == Row->ItemID && Slot.Quantity <= Slot.ItemData->StackHeight)
 		{
-			if (Slot.ItemData->ItemID == Row->ItemID && Slot.Quantity < Row->StackHeight)
+			//Finding the difference between the current stack height and the max stack height, and subtracting
+			//this from amount left to allocate to the inventory. 
+			QuantityToAdd -= Slot.ItemData->StackHeight - Slot.Quantity;
+			Slot.Quantity = Slot.ItemData->StackHeight;
+			
+			if (QuantityToAdd <= 0)
 			{
-				Slot.Quantity += 1;
 				return true;
+			}
+			
+			if (!AllSlotsFilled)
+			{
+				//Using the leftovers and making a new stack holding that quantity, if it is less than or equal to
+				//the max stack height for the given item type.
+				FInventorySlot Stack;
+				Stack.ItemData = Row;
+				
+				if (QuantityToAdd <= Stack.ItemData->StackHeight)
+				{
+					Stack.Quantity = QuantityToAdd;
+					return true;
+				}
+				
+				else
+				{
+					/*AddItemToInventory(RowName, Table, QuantityToAdd);*/
+					return false;
+					//TODO: Figure out how to recursively call this function until QuantityToAdd == 0 or excess is dropped.
+				}
+				
+				
+			}
+
+			else
+			{
+				//TODO: Drop Excess
+				return false;
 			}
 		}
 	}
 	
-	FInventorySlot NewSlot;
-	NewSlot.ItemData = Row;
-	NewSlot.Quantity = 1;
-	
-	InventoryArray.Add(NewSlot);
-	
-	return true;
+	return false;
 }
 
 
@@ -138,7 +147,7 @@ bool UInventoryComponent::RemoveItemFromInventory(FName RowName, UDataTable* Tab
 		return false;
 	}
 
-	const FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
+	FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
 
 	if (Row == nullptr)
 	{
@@ -147,24 +156,18 @@ bool UInventoryComponent::RemoveItemFromInventory(FName RowName, UDataTable* Tab
 
 	bool ItemFound = false;
 
-	FString RowID = GetItemID(*Row);
-
 	for (FInventorySlot& Slot : InventoryArray)
 	{
-		FString SlotID = GetItemID(*Slot.ItemData);
-
-		if (RowID == SlotID)
+		if (Slot.ItemData->ItemID == Row->ItemID)
 		{
 			ItemFound = true;
 
 			Slot.Quantity -= 1;
 
-			if (Slot.Quantity == 0)
+			/*if (Slot.Quantity == 0)
 			{
-
 				InventoryArray.Remove(Slot);
-				//delete Slot;
-			}
+			}*/
 		}
 
 		if (ItemFound)

@@ -20,15 +20,9 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	EItemCategory ItemCategory;
-
-	UPROPERTY(EditAnywhere)
-	float ItemWeight;
 	
 	UPROPERTY(EditAnywhere)
 	float ItemValue;
-
-	UPROPERTY(EditAnywhere)
-	bool Stackable;
 
 	UPROPERTY(EditAnywhere)
 	float StackHeight;
