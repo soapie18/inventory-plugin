@@ -14,8 +14,11 @@ struct FInventorySlot
 {
 	GENERATED_BODY()
 public:
-	const FItemRowData* ItemData = nullptr;	
+	const FItemRowData* ItemData = nullptr;
 	int Quantity = 0;
+
+	//Constructor
+	/*FInventorySlot(int q, FItemRowData* dptr) : Quantity(q), ItemData(dptr) {}*/
 }; 
 
 
@@ -40,6 +43,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// Key functionality
+
+	bool MakeNewSlot(int QuantityToAdd, FItemRowData* Row);
 
 	UFUNCTION( BlueprintCallable )
 	bool AddItemToInventory(FName Row, UDataTable* Table, int QuantityToAdd);
@@ -76,7 +81,7 @@ private:
 	float NetInventoryValue;
 	
 	UPROPERTY(EditAnywhere, Category = "Inventory Details")
-	float MaxCarryCapacity;
+	int MaxInventorySlots;
 
 	bool AllSlotsFilled = false;
 	
