@@ -72,134 +72,130 @@ int UInventoryComponent::GetTotalArrayItemsQuantity()
 
 bool UInventoryComponent::MakeNewSlot(int QuantityToAdd, FItemRowData* Row)
 {
-	//bool AllAdded = false;
+	bool AllAdded = false;
 
-	//if (!AllSlotsFilled)
-	//{
-	//	//Make a slot with up to the max allowed quantity (if quantity to add does not exceed max).
-	//	if (QuantityToAdd <= Row->StackHeight)
-	//	{
-	//		/*FInventorySlot Stack(QuantityToAdd, Row);*/
+	if (!AllSlotsFilled)
+	{
+		//Make a slot with up to the max allowed quantity (if quantity to add does not exceed max).
+		if (QuantityToAdd <= Row->MaxStackHeight)
+		{
+			FInventorySlot Stack(QuantityToAdd, Row);
 
-	//		FInventorySlot Stack;
+			AllAdded = true;
 
-	//		AllAdded = true;
+			return AllAdded; 
+		}
 
-	//		return AllAdded; 
-	//	}
+		//If quantity to add exceeds max, make a slot with max value, subtract this from left to add, 
+		//and then call this function again to go through the process of creating a slot with the right quantity in it next time.
+		else
+		{
+			FInventorySlot Stack(Row->MaxStackHeight, Row);
 
-	//	//If quantity to add exceeds max, make a slot with max value, subtract this from left to add, 
-	//	//and then call this function again to go through the process of creating a slot with the right quantity in it next time.
-	//	else
-	//	{
-	//		/*FInventorySlot Stack(Row->StackHeight, Row);*/
 
-	//		FInventorySlot Stack;
+			QuantityToAdd -= Row->MaxStackHeight;
 
-	//		QuantityToAdd -= Row->StackHeight;
+			if (QuantityToAdd <= 0)
+			{
+				AllAdded = true;
+				return AllAdded;
+			}
 
-	//		if (QuantityToAdd <= 0)
-	//		{
-	//			AllAdded = true;
-	//			return AllAdded;
-	//		}
+			AllAdded = MakeNewSlot(QuantityToAdd, Row);
 
-	//		AllAdded = MakeNewSlot(QuantityToAdd, Row);
+			if (!AllAdded)
+			{
+				AllSlotsFilled = true;
 
-	//		if (!AllAdded)
-	//		{
-	//			AllSlotsFilled = true;
+				//TODO: Drop excess
+			}
 
-	//			//TODO: Drop excess
-	//		}
+			return AllAdded;
+		}
+	}
 
-	//		return AllAdded;
-	//	}
-	//}
+	else
+	{
+		//TODO: Drop excess
+		AllAdded = false;
 
-	//else
-	//{
-	//	//TODO: Drop excess
-	//	AllAdded = false;
-
-	//	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Blue, TEXT("Inventory is full"));
-	//	return false;
-	//}
-	return false;
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Blue, TEXT("Inventory is full"));
+		return false;
+	}
 }
 
 
 bool UInventoryComponent::AddItemToInventory(FName RowName, UDataTable* Table, int QuantityToAdd)
 {
-	//if (AllSlotsFilled)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Blue, TEXT("Inventory is full"));
+	if (AllSlotsFilled)
+	{
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Blue, TEXT("Inventory is full"));
 
-	//	//TODO: Drop excess
+		//TODO: Drop excess
 
-	//	return false;
-	//}
+		return false;
+	}
 
-	//if (Table == nullptr)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Table Null Ptr"));
-	//	return false;
-	//}
-	//
-	//FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
+	if (Table == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Table Null Ptr"));
+		return false;
+	}
+	
+	FItemRowData* Row = Table->FindRow<FItemRowData>(RowName, TEXT("Item Lookup"));
 
-	//if (Row == nullptr)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Row Null Ptr"));
-	//	return false;
-	//}
-	//
-	//for (FInventorySlot& Slot : InventoryArray)
-	//{
-	//	bool AllQuantityAdded = false;
+	if (Row == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::Green, TEXT("Row Null Ptr"));
+		return false;
+	}
+	
+	for (FInventorySlot& Slot : InventoryArray)
+	{
+		bool AllQuantityAdded = false;
 
-	//	//Is there an existing slot, and does it have space?
-	//	if (Slot.ItemData->ItemID == Row->ItemID && Slot.Quantity <= Slot.ItemData->StackHeight)
-	//	{
-	//		//Finding the difference between the current stack height and the max stack height, and subtracting
-	//		//this from amount left to allocate to the inventory. Figuring out how much quantity we should add to the stack found.
+		//Is there an existing slot, and does it have space?
+		if (Slot.ItemData->ItemID == Row->ItemID && Slot.Quantity <= Slot.ItemData->MaxStackHeight)
+		{
+			//Finding the difference between the current stack height and the max stack height, and subtracting
+			//this from amount left to allocate to the inventory. Figuring out how much quantity we should add to the stack found.
 
-	//		int Difference = Slot.ItemData->StackHeight - Slot.Quantity;
+			int Difference = Slot.ItemData->MaxStackHeight - Slot.Quantity;
 
-	//		if (Difference >= QuantityToAdd)
-	//		{
-	//			Slot.Quantity += QuantityToAdd;
+			if (Difference >= QuantityToAdd)
+			{
+				Slot.Quantity += QuantityToAdd;
 
-	//			AllQuantityAdded = true;
-	//			
-	//			return AllQuantityAdded;
-	//		}
+				AllQuantityAdded = true;
+				
+				return AllQuantityAdded;
+			}
 
-	//		//Quantity left to add was larger than space in found slot so set the slot to max and track how much we have left to add to yet another slot.
-	//		QuantityToAdd -= Slot.ItemData->StackHeight - Slot.Quantity;
-	//		Slot.Quantity = Slot.ItemData->StackHeight;
-	//		
-	//		//Exit the function if we are at 0 - is this necessary? because of difference >= check earlier? will keep for now.
-	//		if (QuantityToAdd <= 0)
-	//		{
-	//			return true;
-	//		}
-	//		
-	//		//Using the leftovers and making a new stack holding that quantity if possible. This function calls itself within,
-	//		//so that enough slots are made to hold all the quanitity given to it. If max slots is hit it will instead drop the
-	//		//excess.
-	//		AllQuantityAdded = MakeNewSlot(QuantityToAdd, Row);
+			//Quantity left to add was larger than space in found slot so set the slot to max and track how much we have left to add to yet another slot.
+			QuantityToAdd -= Slot.ItemData->MaxStackHeight - Slot.Quantity;
+			Slot.Quantity = Slot.ItemData->MaxStackHeight;
+			
+			//Exit the function if we are at 0 - is this necessary? because of difference >= check earlier? will keep for now.
+			if (QuantityToAdd <= 0)
+			{
+				return true;
+			}
+			
+			//Using the leftovers and making a new stack holding that quantity if possible. This function calls itself within,
+			//so that enough slots are made to hold all the quanitity given to it. If max slots is hit it will instead drop the
+			//excess.
+			AllQuantityAdded = MakeNewSlot(QuantityToAdd, Row);
 
-	//		return AllQuantityAdded;
-	//	}
+			return AllQuantityAdded;
+		}
 
-	//	else
-	//	{
-	//		bool AllQuantityAdded = MakeNewSlot(QuantityToAdd, Row);
+		else
+		{
+			AllQuantityAdded = MakeNewSlot(QuantityToAdd, Row);
 
-	//		return AllQuantityAdded;
-	//	}
-	//}
+			return AllQuantityAdded;
+		}
+	}
 	return false;
 }
 	
@@ -218,37 +214,7 @@ bool UInventoryComponent::RemoveItemFromInventory(FName RowName, UDataTable* Tab
 		return false;
 	}
 
-	bool ItemFound = false;
-
-	for (FInventorySlot& Slot : InventoryArray)
-	{
-		if (Slot.ItemData->ItemID == Row->ItemID)
-		{
-			ItemFound = true;
-
-			Slot.Quantity -= 1;
-
-			/*if (Slot.Quantity == 0)
-			{
-				InventoryArray.Remove(Slot);
-			}*/
-		}
-
-		if (ItemFound)
-		{
-			break;
-		}
-	}
-
-	if (ItemFound)
-	{
-		return true;
-	}
-
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 // Output funcs

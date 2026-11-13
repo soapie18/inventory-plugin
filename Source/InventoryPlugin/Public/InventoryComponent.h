@@ -15,10 +15,16 @@ struct FInventorySlot
 	GENERATED_BODY()
 public:
 	const FItemRowData* ItemData = nullptr;
-	int Quantity = 0;
+	int32 Quantity = 0;
 
-	//Constructor
-	/*FInventorySlot(int q, FItemRowData* dptr) : Quantity(q), ItemData(dptr) {}*/
+	FInventorySlot();
+
+	FInventorySlot(int32 Q, FItemRowData* DataPtr)
+	{
+		Quantity = Q;
+		ItemData = DataPtr;
+	}
+
 }; 
 
 

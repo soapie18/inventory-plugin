@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Engine/DataTable.h"
 #include "Components/BoxComponent.h"
+#include "ItemRowData.h"
 #include "ItemActor.generated.h"
 
 
@@ -28,8 +29,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(RowType= "ItemRowData"), Category = "Item Details")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(RowType= "ItemRowData"), meta = (ShowOnlyInnerProperties), Category = "Item Details")
 	FDataTableRowHandle ItemRowHandle;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Item Details")
+	int MaxStackQuantity = 0;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Item Details")
+	int CurrentStack = 0;
+
 
 private:
 

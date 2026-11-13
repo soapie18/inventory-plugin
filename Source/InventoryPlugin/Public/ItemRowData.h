@@ -25,7 +25,7 @@ public:
 	float ItemValue;
 
 	UPROPERTY(EditAnywhere)
-	float StackHeight;
+	float MaxStackHeight;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UTexture2D> ItemIcon = nullptr;;
